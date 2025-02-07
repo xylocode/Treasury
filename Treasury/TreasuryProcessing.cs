@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -13,8 +12,9 @@ namespace XyloCode.Tools.Treasury
     {
         string path;
         public string ClientBankExchange { get; set; }
-        public List<TSE_0401060_D07> Data = new List<TSE_0401060_D07>();
+        public List<TSE_0401060_D07> SimpleOrders = new List<TSE_0401060_D07>();
         public List<TSE_0531852_D12> F0531852 = new List<TSE_0531852_D12>();
+        public List<MSC_TransfOrderAcc> TransOrders = new List<MSC_TransfOrderAcc>();
 
         DateTime processingDate;
 
@@ -45,7 +45,7 @@ namespace XyloCode.Tools.Treasury
                 var item = (TSE_0401060_D07)xmlSerializer.Deserialize(xmlReader);
                 xmlReader.Close();
                 xmlReader.Dispose();
-                Data.Add(item);
+                SimpleOrders.Add(item);
             }
 
             /*
@@ -60,13 +60,31 @@ namespace XyloCode.Tools.Treasury
                 F0531852.Add(item);
             }
             */
+
+
+            var D091 = GetFiles(dir, "TSE_TransOrderAcc_D091_*.XML");
+            xmlSerializer = new XmlSerializer(typeof(MSC_TransfOrderAcc));
+            foreach (var file in D091)
+            {
+                var xmlReader = XmlReader.Create(file);
+                var item = (MSC_TransfOrderAcc)xmlSerializer.Deserialize(xmlReader);
+                xmlReader.Close();
+                xmlReader.Dispose();
+                TransOrders.Add(item);
+            }
         }
 
         public void Create1C()
         {
             var now = DateTime.Now;
-            var start = Data.Select(x => x.BasicRequisites_DocDate).Min();
-            var end = Data.Select(x => x.BasicRequisites_DocDate).Max();
+
+            var dates = SimpleOrders
+                .Select(x => x.BasicRequisites_DocDate)
+                .Union(TransOrders.Select(x => x.AccDoc_DocDate));
+                
+              
+            var start = dates.Min();
+            var end = dates.Max();
             
 
             var sb = new StringBuilder();
@@ -93,7 +111,7 @@ namespace XyloCode.Tools.Treasury
             //sb.AppendLine("КонецРасчСчет");
             //sb.AppendLine();
 
-            foreach (var item in Data)
+            foreach (var item in SimpleOrders)
             {
                 sb.AppendLine("СекцияДокумент=Платежное поручение");
                 sb.AppendLine($"Номер={item.BasicRequisites_DocNum}");
@@ -137,6 +155,59 @@ namespace XyloCode.Tools.Treasury
                 //sb.AppendLine($"ВидАккредитива=");
                 //sb.AppendLine($"СрокПлатежа=");
                 //sb.AppendLine($"НомерСчетаПоставщика=");
+                //sb.AppendLine($"ПлатежПоПредст=");
+                //sb.AppendLine($"ДополнУсловия=");
+                //sb.AppendLine($"ДатаОтсылкиДок=");
+                sb.AppendLine("КонецДокумента");
+                sb.AppendLine();
+            }
+
+
+
+            foreach (var item in TransOrders)
+            {
+                sb.AppendLine("СекцияДокумент=Платежное поручение");
+                sb.AppendLine($"Номер={item.AccDoc_DocNum}");
+                sb.AppendLine($"Дата={item.AccDoc_DocDate.ToShortDateString()}");
+                sb.AppendLine($"ДатаСписано={item.ExecDate?.ToShortDateString()}");
+                sb.AppendLine($"ДатаПоступило={processingDate.ToShortDateString()}");
+                sb.AppendLine($"Сумма={item.BasicRequisites_PaySum:F2}");
+
+                sb.AppendLine($"Плательщик={item.Payer_Name}");
+                sb.AppendLine($"ПлательщикИНН={item.Payer_INN}");
+                sb.AppendLine($"ПлательщикКПП={item.Payer_KPP}");
+                sb.AppendLine($"ПлательщикБИК={item.Payer_BIK}");
+                sb.AppendLine($"ПлательщикБанк1={item.Payer_BankName}");
+                sb.AppendLine($"ПлательщикКорсчет={item.Payer_CorrAcc}");
+                sb.AppendLine($"ПлательщикСчет={item.Payer_CheckAcc}");
+
+                sb.AppendLine($"Получатель={item.Recip_Name}");
+                sb.AppendLine($"ПолучательИНН={item.Recip_INN}");
+                sb.AppendLine($"ПолучательКПП={item.Recip_KPP}");
+                sb.AppendLine($"ПолучательБИК={item.Recip_BIK}");
+                sb.AppendLine($"ПолучательБанк1={item.Recip_BankName}");
+                sb.AppendLine($"ПолучательКорсчет={item.Recip_CorrAcc}");
+                sb.AppendLine($"ПолучательСчет={item.Recip_CheckAcc}");
+
+                sb.AppendLine($"ВидПлатежа=электронно");
+                sb.AppendLine($"ВидОплаты=01");
+                //sb.AppendLine($"СрокАкцепта=");
+                //sb.AppendLine($"УсловиеОплаты1=");
+                //sb.AppendLine($"СтатусСоставителя=01");
+                //sb.AppendLine($"ПоказательКБК=");
+                //sb.AppendLine($"ОКАТО=0");
+                //sb.AppendLine($"ПоказательОснования=0");
+                //sb.AppendLine($"ПоказательПериода=0");
+                //sb.AppendLine($"ПоказательНомера=0");
+                //sb.AppendLine($"ПоказательДаты=0");
+                //sb.AppendLine($"ПоказательТипа=0");
+                //sb.AppendLine($"Очередность=");
+                //sb.AppendLine($"Код=");
+                sb.AppendLine($"НазначениеПлатежа={item.DepInfo_PayPurpose}");
+                //sb.AppendLine($"КодНазПлатежа="); //{item.SpecifDetail_D08?[0]?.CodeCS}
+                //sb.AppendLine($"ВидАккредитива=");
+                //sb.AppendLine($"СрокПлатежа=");
+                sb.AppendLine($"НомерСчетаПоставщика={item.Recip_AccNum}");
                 //sb.AppendLine($"ПлатежПоПредст=");
                 //sb.AppendLine($"ДополнУсловия=");
                 //sb.AppendLine($"ДатаОтсылкиДок=");

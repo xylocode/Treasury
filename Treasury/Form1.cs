@@ -55,7 +55,7 @@ namespace XyloCode.Tools.Treasury
 
             var exe = new TreasuryProcessing(textBox1.Text, dateTimePicker1.Value);
             exe.Run();
-            if (exe.Data.Count > 0)
+            if (exe.SimpleOrders.Count > 0 || exe.TransOrders.Count > 0)
             {
                 exe.Create1C();
                 var sw = new StreamWriter(textBox1.Text + "\\1C-FederalTreasury.txt", false, Encoding.GetEncoding(1251));
