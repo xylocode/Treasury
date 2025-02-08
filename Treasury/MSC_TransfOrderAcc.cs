@@ -7,48 +7,50 @@ namespace XyloCode.Tools.Treasury
     [XmlRoot(Namespace = "http://www.roskazna.ru/eb/domain/MSC_TransfOrderAcc/formular", IsNullable = true)]
     public class MSC_TransfOrderAcc
     {
-        [XmlElement(Namespace ="")]
-        public Guid? AccDoc_Guid {  get; set; }
+        public string Name { get; set; }
+
 
         [XmlElement(Namespace = "")]
-
-        public string AccDoc_DocNum {  get; set; }
-
-        [XmlElement(Namespace = "")]
-        public DateTime AccDoc_DocDate {  get; set; }
+        public Guid? AccDoc_Guid { get; set; }
 
         [XmlElement(Namespace = "")]
-        public DateTime? ExecDate {  get; set; }
+        public string AccDoc_DocNum { get; set; }
 
         [XmlElement(Namespace = "")]
-        public decimal? BasicRequisites_PaySum {  get; set; }
+        public DateTime AccDoc_DocDate { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string CurrCode_OKV {  get; set; }
+        public DateTime? ExecDate { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_INN {  get; set; }
+        public decimal? BasicRequisites_PaySum { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_KPP {  get; set; }
+        public string CurrCode_OKV { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_Name {  get; set; }
+        public string Payer_INN { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_AccNum {  get; set; }
+        public string Payer_KPP { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_BIK {  get; set; }
+        public string Payer_Name { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_CorrAcc {  get; set; }
+        public string Payer_AccNum { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_BankName {  get; set; }
+        public string Payer_BIK { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_CheckAcc {  get; set; }
+        public string Payer_CorrAcc { get; set; }
+
+        [XmlElement(Namespace = "")]
+        public string Payer_BankName { get; set; }
+
+        [XmlElement(Namespace = "")]
+        public string Payer_CheckAcc { get; set; }
 
         [XmlElement(Namespace = "")]
         public string Recip_INN { get; set; }
@@ -75,13 +77,13 @@ namespace XyloCode.Tools.Treasury
         public string Recip_CheckAcc { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string DepInfo_PayPurpose {  get; set; }
+        public string DepInfo_PayPurpose { get; set; }
 
         [XmlArray]
-        public List<OrdersAcc_ITEM> OrdersAcc {  get; set; }
+        public List<OrdersAcc_ITEM> OrdersAcc { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Payer_TOFKCode {  get; set; }
+        public string Payer_TOFKCode { get; set; }
 
         [XmlElement(Namespace = "")]
         public string Recip_TOFKCode { get; set; }
@@ -94,24 +96,24 @@ namespace XyloCode.Tools.Treasury
         public string LineNum { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Order_IGK {  get; set; }
+        public string Order_IGK { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Order_Faip {  get; set; }
+        public string Order_Faip { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Order_CodeObjectPay {  get; set; }
+        public string Order_CodeObjectPay { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Order_CodeObjectRec {  get; set; }
+        public string Order_CodeObjectRec { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Order_AnalyticCodePay {  get; set; }
+        public string Order_AnalyticCodePay { get; set; }
 
         [XmlElement(Namespace = "")]
-        public string Order_AnalyticCodeRec {  get; set; }
+        public string Order_AnalyticCodeRec { get; set; }
 
         [XmlElement(Namespace = "")]
-        public decimal? Order_Sum {  get; set; }
+        public decimal? Order_Sum { get; set; }
     }
 }

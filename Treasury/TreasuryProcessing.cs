@@ -13,7 +13,7 @@ namespace XyloCode.Tools.Treasury
         string path;
         public string ClientBankExchange { get; set; }
         public List<TSE_0401060_D07> SimpleOrders = new List<TSE_0401060_D07>();
-        public List<TSE_0531852_D12> F0531852 = new List<TSE_0531852_D12>();
+        //public List<TSE_0531852_D12> F0531852 = new List<TSE_0531852_D12>();
         public List<MSC_TransfOrderAcc> TransOrders = new List<MSC_TransfOrderAcc>();
 
         DateTime processingDate;
@@ -36,10 +36,10 @@ namespace XyloCode.Tools.Treasury
             var dir = new DirectoryInfo(path);
             var D07 = GetFiles(dir, "TSE_0401060_D07_*.XML");
             var D08 = GetFiles(dir, "TSE_0401060_D08_*.XML");
-            var all = D07.Union(D08);
+            var all1 = D07.Union(D08);
 
             var xmlSerializer = new XmlSerializer(typeof(TSE_0401060_D07));
-            foreach (var file in all)
+            foreach (var file in all1)
             {
                 var xmlReader = XmlReader.Create(file);
                 var item = (TSE_0401060_D07)xmlSerializer.Deserialize(xmlReader);
@@ -68,10 +68,24 @@ namespace XyloCode.Tools.Treasury
             {
                 var xmlReader = XmlReader.Create(file);
                 var item = (MSC_TransfOrderAcc)xmlSerializer.Deserialize(xmlReader);
+                item.Name = "Поручение о перечислении на счет исходящее";
                 xmlReader.Close();
                 xmlReader.Dispose();
                 TransOrders.Add(item);
             }
+
+            var D092 = GetFiles(dir, "TSE_IncomingErrand_D092_*.XML");
+            xmlSerializer = new XmlSerializer(typeof(MSC_TransfOrderAcc));
+            foreach (var file in D092)
+            {
+                var xmlReader = XmlReader.Create(file);
+                var item = (MSC_TransfOrderAcc)xmlSerializer.Deserialize(xmlReader);
+                item.Name = "Поручение о перечислении на счет входящее";
+                xmlReader.Close();
+                xmlReader.Dispose();
+                TransOrders.Add(item);
+            }
+
         }
 
         public void Create1C()
@@ -166,7 +180,7 @@ namespace XyloCode.Tools.Treasury
 
             foreach (var item in TransOrders)
             {
-                sb.AppendLine("СекцияДокумент=Платежное поручение");
+                sb.AppendLine($"СекцияДокумент={item.Name}");
                 sb.AppendLine($"Номер={item.AccDoc_DocNum}");
                 sb.AppendLine($"Дата={item.AccDoc_DocDate.ToShortDateString()}");
                 sb.AppendLine($"ДатаСписано={item.ExecDate?.ToShortDateString()}");
